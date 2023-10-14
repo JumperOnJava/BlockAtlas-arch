@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 import static io.github.jumperonjava.blockatlas.api.motd.PingWithCache.FAILED_TEXT;
 
 public class BlockAtlasServer implements Server {
+    private static String POSTREQUESTLINK = "io.github.jumperonjava.blockatlas.api.blockatlas.BlockAtlasServer&sendPostRequest&";
     private String id;
     private String server_name;
     private int player_count;
@@ -115,10 +116,13 @@ public class BlockAtlasServer implements Server {
     private static ThreadPoolExecutor POST_ASYNC = new ScheduledThreadPoolExecutor(4, (new ThreadFactoryBuilder()).setNameFormat("Record server add #%d").setDaemon(true).build());;
     @Override
     public void onConnected() {
+        sendPostRequest(id);
+    }
+    public static void sendPostRequest(String args){
         POST_ASYNC.submit(()->{
             try {
                 String url = "https://blockatlas.net/scripts/record_copy_count.php";
-                String body = "server_id=" + id();
+                String body = "method=ingame;server_id=" + args;
 
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 connection.setRequestMethod("POST");
@@ -129,13 +133,16 @@ public class BlockAtlasServer implements Server {
                     byte[] input = body.getBytes(StandardCharsets.UTF_8);
                     os.write(input, 0, input.length);
                 }
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String response = br.readLine();
+                    System.out.println(response);
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
     }
-
     @Override
     public void onAdded() {
         onConnected();
@@ -149,5 +156,10 @@ public class BlockAtlasServer implements Server {
     @Override
     public String getVoteLink() {
         return server_url()+"/vote";
+    }
+
+    @Override
+    public String getPostReq() {
+        return POSTREQUESTLINK+id;
     }
 }

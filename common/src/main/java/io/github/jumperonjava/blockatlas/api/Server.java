@@ -28,4 +28,6 @@ public interface Server {
     public void voteAction();
 
     String getVoteLink();
+
+    String getPostReq();
 }

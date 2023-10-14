@@ -39,7 +39,7 @@ shadowJar {
 }
 
 remapJar {
-    archiveFileName = "${archivesBaseName}-${project.version}-fabric.jar"
+    archiveFileName = "${archivesBaseName}-${project.version}-${rootProject.minecraft_version}-fabric.jar"
     injectAccessWidener = true
     inputFile.set shadowJar.archiveFile
     dependsOn shadowJar

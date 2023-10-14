@@ -6,7 +6,7 @@ import io.github.jumperonjava.blockatlas.api.ListHandler;
 import io.github.jumperonjava.blockatlas.api.Server;
 import io.github.jumperonjava.blockatlas.api.ServerApi;
 import io.github.jumperonjava.blockatlas.api.Tag;
-import io.github.jumperonjava.blockatlas.VoteLink;
+import io.github.jumperonjava.blockatlas.util.ServerInfoExt;
 import io.github.jumperonjava.blockatlas.gui.elements.*;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConnectScreen;
@@ -227,7 +227,8 @@ public class ServerScreen extends Screen {
 
     private void addServer(Server server) {
         var serverInfo = new ServerInfo(server.server_name(),server.server_ip(), ServerInfo.ServerType.OTHER);
-        ((VoteLink)serverInfo).setVoteLink(server.getVoteLink());
+        ((ServerInfoExt)serverInfo).setVoteLink(server.getVoteLink());
+        ((ServerInfoExt)serverInfo).setPostReq(server.getPostReq());
 
         var servers = new ServerList(client);
         servers.loadFile();
