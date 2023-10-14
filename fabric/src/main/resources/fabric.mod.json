@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "blockatlas",
+  "version": "${version}",
+  "name": "BlockAtlas Server List",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/JavaJumper/BlockAtlas"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/blockatlas/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+    ]
+  },
+  "accessWidener": "blockatlas.accesswidener",
+  "mixins": [
+    "BlockAtlas.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.20",
+    "fabric-api": "*",
+    "minecraft": "1.20.2"
+  }
+}

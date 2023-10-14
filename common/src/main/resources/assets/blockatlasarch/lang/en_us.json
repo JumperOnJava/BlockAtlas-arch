@@ -1,0 +1,10 @@
+{
+  "blockatlas.findservers": "Find Servers",
+  "blockatlas.servererror": "Error receiving API response",
+  "blockatlas.motdload": "Loading description...",
+  "blockatlas.motdfail": "Failed to get server description",
+  "blockatlas.loadmore": "Load more",
+  "blockatlas.title": "Discover Servers by BlockAtlas ",
+  "blockatlas.vote": "Vote",
+  "blockatlas.switch": "Switch server"
+}
