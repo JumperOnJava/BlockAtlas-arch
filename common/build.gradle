@@ -8,6 +8,10 @@ architectury {
     common()
 }
 
+loom{
+    accessWidenerPath = file("/src/main/resources/blockatlas.accesswidener")
+}
+
 publishing {
     publications {
         mavenCommon(MavenPublication) {

@@ -53,7 +53,7 @@ public class ServerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
+        renderBackground(context,mouseX,mouseY,delta);
         super.render(context, mouseX, mouseY, delta);
     }
 
@@ -98,13 +98,15 @@ public class ServerScreen extends Screen {
         addDrawable(((context, mouseX, mouseY, delta) -> context.drawCenteredTextWithShadow(textRenderer,Text.translatable("blockatlas.title"),width/2,8,0xFFFFFFFF)));
 
         //lower buttons grid
-        var axis = new AxisGridWidget(width/2-350/2,height-bottom+4, 350,20, AxisGridWidget.DisplayAxis.HORIZONTAL);
+        var listWidth = SERVER_LIST_SIZE+TAG_LIST_SIZE;
+        var axis = new AxisGridWidget(width/2-(listWidth)/2,height-bottom+4, listWidth,20, AxisGridWidget.DisplayAxis.HORIZONTAL);
         //buttons themselves
+        var buttonSize = (listWidth-44)/4-4;
         var directConnect = new ButtonWidget.Builder(Text.translatable("selectServer.select"),(b)->{
             connect(selectedServer);
-        }).dimensions(0,0,100,20).build();
-        var addServer = new ButtonWidget.Builder(Text.translatable("selectServer.add"),(b)->{addServer(selectedServer);}).dimensions(0,0,100,20).build();
-        var vote = new ButtonWidget(0,0,100,20,Text.translatable("blockatlas.vote"),(b)->{
+        }).dimensions(0,0,buttonSize,20).build();
+        var addServer = new ButtonWidget.Builder(Text.translatable("selectServer.add"),(b)->{addServer(selectedServer);}).dimensions(0,0,buttonSize,20).build();
+        var vote = new ButtonWidget.Builder(Text.translatable("blockatlas.vote"),(b)->{
             try{
                 Util.getOperatingSystem().open(new URL(selectedServer.getVoteLink()));
             }
@@ -117,12 +119,21 @@ public class ServerScreen extends Screen {
                 }
             },50);
             setFocused(null);
-        },ButtonWidget.DEFAULT_NARRATION_SUPPLIER){
-            @Override
-            protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-                super.renderButton(context, mouseX, mouseY, delta);
+        }).dimensions(0,0,buttonSize,20).build();
+        var addServerToList = new ButtonWidget.Builder(Text.translatable("blockatlas.addToList"),(b)->{
+            try{
+                Util.getOperatingSystem().open(new URL("https://blockatlas.net/add-server"));
             }
-        };
+            catch (Exception e){e.printStackTrace();}
+            new Timer().schedule(new TimerTask(){
+
+                @Override
+                public void run() {
+                    b.setFocused(false);
+                }
+            },50);
+            setFocused(null);
+        }).dimensions(0,0,buttonSize,20).build();
         var close = new ButtonWidget.Builder(Text.translatable("gui.back"),b->this.close()).width(40).build();
         this.deactivateButtons = () ->{
             directConnect.active=false;
@@ -135,6 +146,7 @@ public class ServerScreen extends Screen {
             vote.active=true;
         };
         deactivateButtons.run();
+        addDrawableChild(axis.add(addServerToList));
         addDrawableChild(axis.add(directConnect));
         addDrawableChild(axis.add(addServer));
         addDrawableChild(axis.add(vote));
@@ -164,18 +176,12 @@ public class ServerScreen extends Screen {
     public void updateServerList(){
         var iconsize = smallmode?32:48;
         RenderSystem.recordRenderCall(()->{
-        serverListWidget.children().clear();
-        boolean noMoreServers = false;
-            for (Server server : new ArrayList<>(serverList)) {
-                if (server == null)
-                {
-                    noMoreServers=true;
-                    break;
-                }
-                var e = new ScrollListWidget.ScrollListEntry() {
+            serverListWidget.children().clear();
+            new ArrayList<>(serverList).forEach(server -> {
+                var e = new ScrollListWidget.ScrollListEntry(){
                 };
                 if (server.featured()) {
-                    e.addDrawable((a, b, c, d) -> a.drawTexture(new Identifier("blockatlas", "textures/gui/featuredtext.png"), 54 + textRenderer.getWidth(server.server_name()), 5, 0, 0, 51, 7, 51, 7));
+                    e.addDrawable((a, b, c, d) -> a.drawTexture(new Identifier("blockatlas", "textures/gui/featuredtext.png"), 54 + textRenderer.getWidth(server.server_name()), 5,0,0, 51, 7,51,7));
                 }
                 e.addDrawable(new NonCenterTextWidget(iconsize + 4, 4, Text.literal(server.server_name()), textRenderer));
                 e.addDrawable(new TextureWidget(new LazyUrlTexture(server.favicon_url()), 2, 2, iconsize, iconsize));
@@ -184,17 +190,17 @@ public class ServerScreen extends Screen {
                     int lineindex = 1;
                     List<OrderedText> list = textRenderer.wrapLines(server.motd().get(), 271);
                     for (var line : list) {
-                        context.drawText(textRenderer, line, iconsize + 4, lineindex * 10 + (smallmode ? 6 : 10), 0xFFFFFFFF, false);
+                        context.drawText(textRenderer, line, iconsize + 4, lineindex * 10 + (smallmode?6:10), 0xFFFFFFFF, false);
                         lineindex++;
-                        if (lineindex > 3)
+                        if(lineindex>3)
                             break;
                     }
                 });
-                e.addDrawableChild(new PingIcon(server.server_ip(), SERVER_LIST_SIZE - 5, 2), false);
+                e.addDrawableChild(new PingIcon(server.server_ip(),SERVER_LIST_SIZE-5,2),false);
                 var ref = new Object() {
                     long lastClickTime = 1000L;
                 };
-                e.addDrawableChild(new NonTexturedButton(0, -10, SERVER_LIST_SIZE + 20, 500, Text.empty(), (b) -> {
+                e.addDrawableChild(new NonTexturedButton(0, -10, SERVER_LIST_SIZE+20,500, Text.empty(), (b) -> {
                     e.setMeActive();
                     selectedServer = server;
                     activateButtons.run();
@@ -204,7 +210,7 @@ public class ServerScreen extends Screen {
                     ref.lastClickTime = Util.getMeasuringTimeMs();
                 }), false);
                 serverListWidget.addEntry(e);
-            }
+            });
             var e = new ScrollListWidget.ScrollListEntry(){
                 protected boolean selectable(){
                     return false;
@@ -212,12 +218,8 @@ public class ServerScreen extends Screen {
             };
             if(serverListWidget.children().size()==0)
                 return;
-            var load = e.addDrawableChild(new ButtonWidget.Builder(Text.translatable("blockatlas.loadmore"),(b)-> loadMore.run())
+            e.addDrawableChild(new ButtonWidget.Builder(Text.translatable("blockatlas.loadmore"),(b)-> loadMore.run())
                     .dimensions(SERVER_LIST_SIZE/2-50,14,100,20).build(),false);
-            if(noMoreServers)
-            {
-                load.active = false;
-            }
             serverListWidget.addEntry(e);
         });
 

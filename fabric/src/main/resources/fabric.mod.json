@@ -15,7 +15,6 @@
     "client": [
     ]
   },
-  "accessWidener": "blockatlas.accesswidener",
   "mixins": [
     "BlockAtlas.mixins.json"
   ],

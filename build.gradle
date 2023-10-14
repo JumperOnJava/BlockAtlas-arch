@@ -12,7 +12,6 @@ subprojects {
 
     loom {
         silentMojangMappingsLicense()
-        accessWidenerPath = file("../common/src/main/resources/blockatlas.accesswidener")
     }
 
     dependencies {

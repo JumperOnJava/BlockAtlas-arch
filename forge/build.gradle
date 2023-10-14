@@ -17,6 +17,12 @@ loom{
     forge {
         mixinConfig "BlockAtlas.mixins.json"
     }
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    forge {
+        convertAccessWideners = true
+        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+    }
 }
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
@@ -41,6 +47,7 @@ shadowJar {
 }
 
 remapJar {
+    archiveFileName = "${archivesBaseName}-${project.version}-forge.jar"
     inputFile.set shadowJar.archiveFile
     dependsOn shadowJar
     archiveClassifier.set(null)

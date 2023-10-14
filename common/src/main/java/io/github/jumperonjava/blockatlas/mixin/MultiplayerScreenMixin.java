@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -96,14 +97,12 @@ public abstract class MultiplayerScreenMixin extends Screen {
         }
     }
 
-    @ModifyArgs(method = "init", at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/AxisGridWidget;<init>(IILnet/minecraft/client/gui/widget/AxisGridWidget$DisplayAxis;)V"))
-    void modifyArgAxis(Args args){
-        args.set(0, (Integer)args.get(0)+104);
+    @ModifyArg(method = "init",index = 0,at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/AxisGridWidget;<init>(IILnet/minecraft/client/gui/widget/AxisGridWidget$DisplayAxis;)V"))
+    int modifyArgAxis(int a){
+        return a+104;
     }
-    @ModifyArgs(method = "init", at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;width(I)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;"))
-    void modifyArgWidth(Args args){
-        args.set(0,100);
+    @ModifyArg(method = "init", at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;width(I)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;"))
+    int modifyArgWidth(int a){
+        return 100;
     }
-
-
 }
