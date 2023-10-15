@@ -8,11 +8,14 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.realms.gui.screen.RealmsMainScreen;
 import net.minecraft.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class BlockAtlasInit{
     public static io.github.jumperonjava.blockatlas.api.ServerApi api;
-    public static final MinecraftClient client = MinecraftClient.getInstance(); 
+    public static final MinecraftClient client = MinecraftClient.getInstance();
+    public static final Logger LOGGER = LoggerFactory.getLogger("BlockAtlas");
     public static void disconnect(){
         boolean bl = client.isInSingleplayer();
         boolean bl2 = false;
