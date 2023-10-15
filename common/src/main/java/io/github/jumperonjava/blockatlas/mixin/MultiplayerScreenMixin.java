@@ -3,7 +3,6 @@ package io.github.jumperonjava.blockatlas.mixin;
 import io.github.jumperonjava.blockatlas.BlockAtlasInit;
 import io.github.jumperonjava.blockatlas.util.ServerInfoExt;
 import io.github.jumperonjava.blockatlas.gui.ServerScreen;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -13,6 +12,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
@@ -92,7 +92,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         }).dimensions(width/2-206,1000000,100,20).build());
     }
     @Inject(method = "render",at = @At("HEAD") )
-    void moveVoteButton(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci){
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         MultiplayerServerListWidget.Entry entry = this.serverListWidget.getSelectedOrNull();
         if (entry instanceof MultiplayerServerListWidget.ServerEntry) {
             ServerInfo serverInfo = ((MultiplayerServerListWidget.ServerEntry) entry).getServer();

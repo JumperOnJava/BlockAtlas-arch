@@ -1,11 +1,13 @@
 package io.github.jumperonjava.blockatlas.gui.elements;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.jumperonjava.blockatlas.api.motd.PingWithCache;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -46,13 +48,13 @@ public class PingIcon implements Drawable, Element {
         this.client = MinecraftClient.getInstance();
     }
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         var server = PingWithCache.getServer(this.address).orElse(null);
 
         Text text = server == null ? Text.literal("").formatted(Formatting.RED) : Text.translatable(server.playerCountLabel.getString()).setStyle(Style.EMPTY.withColor(0xFFAAAAAA));
         //Text text = bl && false ? server.version.copy().formatted(Formatting.RED) : server.playerCountLabel;
         int j = this.client.textRenderer.getWidth((StringVisitable) text);
-        context.drawText(this.client.textRenderer, (Text) text, x - j - 10 - 2, y + 1, 8421504, false);
+        DrawableHelper.drawTextWithShadow(context, this.client.textRenderer, (Text) text, x - j - 10 - 2, y + 1, 8421504);
         int k = 0;
         int l = 0;
         List list2;
@@ -87,12 +89,12 @@ public class PingIcon implements Drawable, Element {
                 list2 = Collections.emptyList();
             }
         }
-
-        context.drawTexture(ICONS_TEXTURE, x - 10, y, (float) (k * 10), (float) (176 + l * 8), 10, 8, 256, 256);
+        RenderSystem.setShaderTexture(0,ICONS_TEXTURE);
+        DrawableHelper.drawTexture(context,x - 10, y, (float) (k * 10), (float) (176 + l * 8), 10, 8, 256, 256);
         //context.fill(x,y,x-10,y+8,0xFFFFFF00);
         if(isMouseOver(mouseX,mouseY)){
             var pingtext = Text.literal(String.valueOf(server == null ? "Failed to get ping" : server.ping+" ms"));
-            context.drawTooltip(client.textRenderer,pingtext,mouseX-20-client.textRenderer.getWidth(pingtext.getString()),mouseY+12);
+            //DrawableHelper.too(client.textRenderer,pingtext,mouseX-20-client.textRenderer.getWidth(pingtext.getString()),mouseY+12);
         }
 
     }

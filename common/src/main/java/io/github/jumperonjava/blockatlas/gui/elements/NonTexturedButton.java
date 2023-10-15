@@ -1,8 +1,8 @@
 package io.github.jumperonjava.blockatlas.gui.elements;
 
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -12,7 +12,7 @@ public class NonTexturedButton extends ButtonWidget {
     }
     public TextureWidget plusIcon;
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         return;
     }
 }

@@ -8,7 +8,7 @@ import io.github.jumperonjava.blockatlas.api.ServerApi;
 import io.github.jumperonjava.blockatlas.api.Tag;
 import io.github.jumperonjava.blockatlas.util.ServerInfoExt;
 import io.github.jumperonjava.blockatlas.gui.elements.*;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -18,6 +18,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -52,7 +53,7 @@ public class ServerScreen extends Screen {
     private boolean smallmode=false;
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
     }
@@ -95,7 +96,7 @@ public class ServerScreen extends Screen {
         serverListWidget = new ScrollListWidget(client,SERVER_LIST_SIZE,height-bottom,centerpos+TAG_LIST_SIZE+LIST_GAP,top,smallmode?38:54);
         updateServerList();
         //title
-        addDrawable(((context, mouseX, mouseY, delta) -> context.drawCenteredTextWithShadow(textRenderer,Text.translatable("blockatlas.title"),width/2,8,0xFFFFFFFF)));
+        addDrawable(((context, mouseX, mouseY, delta) -> DrawableHelper.drawCenteredTextWithShadow(context,textRenderer,Text.translatable("blockatlas.title"),width/2,8,0xFFFFFFFF)));
 
         //lower buttons grid
         var listWidth = SERVER_LIST_SIZE+TAG_LIST_SIZE;
@@ -161,7 +162,7 @@ public class ServerScreen extends Screen {
     private void connect(Server selectedServer) {
         BlockAtlasInit.disconnect();
         var t = (selectedServer.server_ip()+":25565").split(":");
-        ConnectScreen.connect(this,client,new ServerAddress(t[0], Integer.parseInt(t[1])),new ServerInfo("",selectedServer.server_ip(), false),true);
+        ConnectScreen.connect(this,client,new ServerAddress(t[0], Integer.parseInt(t[1])),new ServerInfo("",selectedServer.server_ip(), false));
         selectedServer.onConnected();
     }
 
@@ -186,7 +187,10 @@ public class ServerScreen extends Screen {
                 var e = new ScrollListWidget.ScrollListEntry() {
                 };
                 if (server.featured()) {
-                    e.addDrawable((a, b, c, d) -> a.drawTexture(new Identifier("blockatlas", "textures/gui/featuredtext.png"), 54 + textRenderer.getWidth(server.server_name()), 5, 0, 0, 51, 7, 51, 7));
+                    e.addDrawable((a, b, c, d) -> {
+                        RenderSystem.setShaderTexture(0,new Identifier("blockatlas", "textures/gui/featuredtext.png"));
+                        DrawableHelper.drawTexture(a,54 + textRenderer.getWidth(server.server_name()), 5, 0, 0, 51, 7, 51, 7);
+                    });
                 }
                 e.addDrawable(new NonCenterTextWidget(iconsize + 4, 4, Text.literal(server.server_name()), textRenderer));
                 e.addDrawable(new TextureWidget(new LazyUrlTexture(server.favicon_url()), 2, 2, iconsize, iconsize));
@@ -195,7 +199,7 @@ public class ServerScreen extends Screen {
                     int lineindex = 1;
                     List<OrderedText> list = textRenderer.wrapLines(server.motd().get(), 271);
                     for (var line : list) {
-                        context.drawText(textRenderer, line, iconsize + 4, lineindex * 10 + (smallmode ? 6 : 10), 0xFFFFFFFF, false);
+                        textRenderer.draw(context, line, iconsize + 4, lineindex * 10 + (smallmode ? 6 : 10), 0xFFFFFFFF);
                         lineindex++;
                         if (lineindex > 3)
                             break;
@@ -274,8 +278,8 @@ public class ServerScreen extends Screen {
             var e = new ScrollListWidget.ScrollListEntry();
             var lw = target.serverListWidget;
             e.addDrawable((context, mouseX, mouseY, delta) -> {
-                context.drawCenteredTextWithShadow(target.client.textRenderer,Text.translatable("blockatlas.servererror"),lw.getRowWidth()/2,4,0xFFFF8888);
-                context.drawCenteredTextWithShadow(target.client.textRenderer,Text.literal(error.getMessage()),lw.getRowWidth()/2,14,0xFFFF8888);
+                DrawableHelper.drawCenteredTextWithShadow(context,target.client.textRenderer,Text.translatable("blockatlas.servererror"),lw.getRowWidth()/2,4,0xFFFF8888);
+                DrawableHelper.drawCenteredTextWithShadow(context,target.client.textRenderer,Text.literal(error.getMessage()),lw.getRowWidth()/2,14,0xFFFF8888);
             });
             lw.addEntry(e);
         }
