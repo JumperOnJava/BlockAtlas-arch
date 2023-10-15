@@ -118,15 +118,15 @@ public class BlockAtlasServer implements Server {
     private static ThreadPoolExecutor POST_ASYNC = new ScheduledThreadPoolExecutor(4, (new ThreadFactoryBuilder()).setNameFormat("Record server add #%d").setDaemon(true).build());;
     @Override
     public void onConnected() {
-        sendPostRequest("%d,ingame".formatted(id()));
+        sendPostRequest(id()+"@ingame");
     }
     public static void sendPostRequest(String arguments){
         POST_ASYNC.submit(()->{
             try {
-                var args = arguments.split(",");
+                var args = arguments.split("@");
                 String url = "https://blockatlas.net/scripts/record_copy_count.php";
                 String body = "server_id=" + args[0] + "&method=" + args[1];
-
+                LOGGER.info("Sent record copy count to blockatlas api {}",body);
                 HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -138,7 +138,7 @@ public class BlockAtlasServer implements Server {
                 }
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                     String response = br.readLine();
-                    //LOGGER.info(response);
+                    LOGGER.info(response);
                 }
 
             } catch (IOException e) {
@@ -148,7 +148,7 @@ public class BlockAtlasServer implements Server {
     }
     @Override
     public void onAdded() {
-        sendPostRequest("%d,ingameadd".formatted(id()));
+        sendPostRequest(id()+"@ingameadd");
     }
 
     @Override
@@ -163,6 +163,6 @@ public class BlockAtlasServer implements Server {
 
     @Override
     public String getPostReq() {
-        return POSTREQUESTLINK+id;
+        return POSTREQUESTLINK+id+"@ingame";
     }
 }
