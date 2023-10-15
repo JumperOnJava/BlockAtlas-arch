@@ -1,13 +1,13 @@
 package io.github.jumperonjava.blockatlas.mixin;
 
 import io.github.jumperonjava.blockatlas.BlockAtlasInit;
+import io.github.jumperonjava.blockatlas.gui.backport.ButtonWidgetBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,27 +25,18 @@ public abstract class GameMenuScreenMixin extends Screen {
         super(title);
     }
 
-    @Shadow protected abstract ButtonWidget createButton(Text text, Supplier<Screen> screenSupplier);
-
-    @Shadow protected abstract void disconnect();
-    @ModifyArg(method = "initWidgets",index = 1,at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/GridWidget$Adder;add(Lnet/minecraft/client/gui/widget/Widget;I)Lnet/minecraft/client/gui/widget/Widget;"))
-    int takeonecolumn(int i){
-        if(!this.client.isInSingleplayer())
-        return 1;
-        else return i;
-    }
-    @ModifyArg(method = "initWidgets",at = @At(value = "INVOKE",ordinal = 1,target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;width(I)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;"))
+    @ModifyArg(method = "initWidgets",index = 2,at = @At(value = "INVOKE",ordinal = 8,target = "Lnet/minecraft/client/gui/widget/ButtonWidget;<init>(IIIILnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)V"))
     int changeexitbuttonsize(int i) {
         if(!this.client.isInSingleplayer())
         return 98;
         else return i;
     }
-    @Inject(method = "initWidgets", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE",shift = At.Shift.BEFORE,target = "Lnet/minecraft/client/gui/widget/GridWidget;refreshPositions()V"))
-    void addServersButton(CallbackInfo ci, GridWidget gridWidget, GridWidget.Adder adder, Text text){
+    @Inject(method = "initWidgets", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE",ordinal = 8,shift = At.Shift.BEFORE,target = "Lnet/minecraft/client/gui/screen/GameMenuScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;"))
+    void addServersButton(CallbackInfo ci){
         if(!this.client.isInSingleplayer())
-        adder.add(new ButtonWidget.Builder(Text.translatable("blockatlas.switch"),(b)-> {
+        addDrawableChild(new ButtonWidgetBuilder(Text.translatable("blockatlas.switch"),(b)-> {
             //new MultiplayerScreen(new TitleScreen());
             client.setScreen(new MultiplayerScreen(this));
-            }).width(98).build());
+            }).position(this.width / 2 + 4, this.height / 4 + 96 + -16).width(98).build());
     }
 }

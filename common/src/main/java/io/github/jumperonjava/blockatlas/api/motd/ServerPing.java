@@ -59,9 +59,9 @@ public class ServerPing{
     }
 
     private void save() {
-        server.players=null;
+        //server.players=null;
         server.setResourcePackPolicy(ServerInfo.ResourcePackPolicy.ENABLED);
-        server.setFavicon(null);
+        server.setIcon(null);
         finish.accept(server);
     }
 }

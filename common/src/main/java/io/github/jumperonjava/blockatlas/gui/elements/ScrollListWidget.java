@@ -1,6 +1,7 @@
 package io.github.jumperonjava.blockatlas.gui.elements;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
@@ -59,7 +60,19 @@ public class ScrollListWidget extends AlwaysSelectedEntryListWidget<ScrollListWi
 
     @Override
     public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
+        beginScissor(left,top,left+width,height);
         super.render(context, mouseX, mouseY, delta);
+        RenderSystem.disableScissor();
+    }
+    public void beginScissor(double x, double y, double endX, double endY)
+    {
+        double width = endX - x;
+        double height = endY - y;
+        width = Math.max(0, width);
+        height = Math.max(0, height);
+        float d = (float) client.getWindow().getScaleFactor();
+        int ay = (int) ((client.getWindow().getScaledHeight() - (y + height)) * d);
+        RenderSystem.enableScissor((int) (x * d), ay, (int) (width * d), (int) (height * d));
     }
     /**
      * Scroll list entry. Out of box does nothing but using addDrawableChild method you can add widgets for custom behaviour.

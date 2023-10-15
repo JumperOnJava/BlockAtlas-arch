@@ -105,11 +105,9 @@ public class PingIcon implements Drawable, Element {
     }
 
 
-    @Override
     public void setFocused(boolean focused) {
     }
 
-    @Override
     public boolean isFocused() {
         return false;
     }

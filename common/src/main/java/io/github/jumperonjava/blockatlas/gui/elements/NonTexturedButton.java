@@ -1,6 +1,5 @@
 package io.github.jumperonjava.blockatlas.gui.elements;
 
-import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
