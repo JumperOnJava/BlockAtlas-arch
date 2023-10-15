@@ -101,7 +101,7 @@ public class ServerScreen extends Screen {
         var listWidth = SERVER_LIST_SIZE+TAG_LIST_SIZE;
         var axis = new AxisGridWidget(width/2-(listWidth)/2,height-bottom+4, listWidth,20, AxisGridWidget.DisplayAxis.HORIZONTAL);
         //buttons themselves
-        var buttonSize = (listWidth-44)/4-4;
+        var buttonSize = (listWidth-44)/3-4;
         var directConnect = new ButtonWidget.Builder(Text.translatable("selectServer.select"),(b)->{
             connect(selectedServer);
         }).dimensions(0,0,buttonSize,20).build();
@@ -133,7 +133,7 @@ public class ServerScreen extends Screen {
                 }
             },50);
             setFocused(null);
-        }).dimensions(0,0,buttonSize,20).build();
+        }).dimensions(width/2+listWidth/2-100,2,buttonSize,20).build();
         var close = new ButtonWidget.Builder(Text.translatable("gui.back"),b->this.close()).width(40).build();
         this.deactivateButtons = () ->{
             directConnect.active=false;
@@ -146,7 +146,6 @@ public class ServerScreen extends Screen {
             vote.active=true;
         };
         deactivateButtons.run();
-        addDrawableChild(axis.add(addServerToList));
         addDrawableChild(axis.add(directConnect));
         addDrawableChild(axis.add(addServer));
         addDrawableChild(axis.add(vote));
@@ -156,6 +155,7 @@ public class ServerScreen extends Screen {
         updateServerList();
         addDrawableChild(tagListWidget);
         addDrawableChild(serverListWidget);
+        addDrawableChild((addServerToList));
     }
 
     private void connect(Server selectedServer) {
