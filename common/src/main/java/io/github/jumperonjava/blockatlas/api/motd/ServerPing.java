@@ -38,7 +38,7 @@ public class ServerPing{
     public static void ping(String address,Consumer<ServerInfo> onFinish,Runnable onFail, int triesLeft){
         if(triesLeft==0)
             return;
-        var serverinfo = new ServerInfo("",address, ServerInfo.ServerType.OTHER);
+        var serverinfo = new ServerInfo("",address, false);
 
         var ping = new ServerPing();
         ping.finish = onFinish;

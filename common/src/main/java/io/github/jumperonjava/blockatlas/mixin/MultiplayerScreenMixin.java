@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.AxisGridWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
@@ -62,7 +62,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         BlockAtlasInit.initApi();
     }
     @Inject(method = "init", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/AxisGridWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;",ordinal = 1,shift = At.Shift.AFTER),locals = LocalCapture.CAPTURE_FAILHARD)
-    void addButtonToAxis(CallbackInfo ci, ButtonWidget buttonWidget, ButtonWidget buttonWidget2, ButtonWidget buttonWidget3, ButtonWidget buttonWidget4, DirectionalLayoutWidget directionalLayoutWidget, AxisGridWidget axisGridWidget){
+    void addButtonToAxis(CallbackInfo ci, ButtonWidget buttonWidget, ButtonWidget buttonWidget2, ButtonWidget buttonWidget3, ButtonWidget buttonWidget4, GridWidget gridWidget, GridWidget.Adder adder, AxisGridWidget axisGridWidget){
         axisGridWidget.add(addDrawableChild(new ButtonWidget.Builder(Text.translatable("blockatlas.findservers"), (x)-> {
             var screen = new ServerScreen(BlockAtlasInit.api);
             client.setScreen(screen);

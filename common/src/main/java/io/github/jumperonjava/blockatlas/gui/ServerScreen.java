@@ -53,7 +53,7 @@ public class ServerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context,mouseX,mouseY,delta);
+        renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
     }
 
@@ -161,7 +161,7 @@ public class ServerScreen extends Screen {
     private void connect(Server selectedServer) {
         BlockAtlasInit.disconnect();
         var t = (selectedServer.server_ip()+":25565").split(":");
-        ConnectScreen.connect(this,client,new ServerAddress(t[0], Integer.parseInt(t[1])),new ServerInfo("",selectedServer.server_ip(), ServerInfo.ServerType.OTHER),true);
+        ConnectScreen.connect(this,client,new ServerAddress(t[0], Integer.parseInt(t[1])),new ServerInfo("",selectedServer.server_ip(), false),true);
         selectedServer.onConnected();
     }
 
@@ -233,7 +233,7 @@ public class ServerScreen extends Screen {
     }
 
     private void addServer(Server server) {
-        var serverInfo = new ServerInfo(server.server_name(),server.server_ip(), ServerInfo.ServerType.OTHER);
+        var serverInfo = new ServerInfo(server.server_name(),server.server_ip(), false);
         ((ServerInfoExt)serverInfo).setVoteLink(server.getVoteLink());
         ((ServerInfoExt)serverInfo).setPostReq(server.getPostReq());
 
