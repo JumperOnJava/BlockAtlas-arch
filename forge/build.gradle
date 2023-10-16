@@ -48,6 +48,7 @@ shadowJar {
 
 remapJar {
     archiveFileName = "${archivesBaseName}-${project.version}-${rootProject.minecraft_version}-forge.jar"
+    buildDir = "${rootProject.rootDir}/.finalbuilds"
     inputFile.set shadowJar.archiveFile
     dependsOn shadowJar
     archiveClassifier.set(null)
@@ -57,11 +58,11 @@ jar {
     archiveClassifier.set("dev")
 }
 
-sourcesJar {
+/*sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
-}
+}*/
 
 components.java {
     withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {

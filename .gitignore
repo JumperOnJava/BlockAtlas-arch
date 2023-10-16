@@ -1,5 +1,5 @@
 .gradle/
 .idea/
+.finalbuilds/
 build/
-gradle/
 run/

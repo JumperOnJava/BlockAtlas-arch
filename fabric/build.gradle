@@ -40,6 +40,9 @@ shadowJar {
 
 remapJar {
     archiveFileName = "${archivesBaseName}-${project.version}-${rootProject.minecraft_version}-fabric.jar"
+    //archivePath += "../../../../finalbuild"
+
+    buildDir = "${rootProject.rootDir}/.finalbuilds"
     injectAccessWidener = true
     inputFile.set shadowJar.archiveFile
     dependsOn shadowJar
@@ -49,12 +52,12 @@ remapJar {
 jar {
     archiveClassifier.set("dev")
 }
-
+/*
 sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
-}
+}*/
 
 components.java {
     withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
