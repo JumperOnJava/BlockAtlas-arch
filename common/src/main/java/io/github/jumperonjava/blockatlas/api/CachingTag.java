@@ -1,6 +1,6 @@
 package io.github.jumperonjava.blockatlas.api;
 
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +13,7 @@ public class CachingTag implements Tag {
         tag.setServersFromTag(proxy);
     }
     @Override
-    public Text getDisplayName() {
+    public MutableText getDisplayName() {
         return tag.getDisplayName();
     }
     @Override

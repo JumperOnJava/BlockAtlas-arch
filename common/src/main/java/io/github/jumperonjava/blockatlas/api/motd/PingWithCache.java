@@ -22,7 +22,7 @@ public class PingWithCache {
     public static final Map<String, Long> getting = new HashMap<>();
 
     private static File getCacheDirectory() {
-        return MinecraftClient.getInstance().getResourcePackDir().toPath().resolve("../config").resolve("blockatlas/motdcache.json").toFile();
+        return MinecraftClient.getInstance().getResourcePackDir().resolve("../config").resolve("blockatlas/motdcache.json").toFile();
     }
 
     static {

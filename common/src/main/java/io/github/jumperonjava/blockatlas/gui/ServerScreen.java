@@ -19,6 +19,7 @@ import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -147,14 +148,14 @@ public class ServerScreen extends Screen {
             vote.active=true;
         };
 
-        directConnect.x=width/2-listWidth/2;
-        addServer.x=width/2-listWidth/2+(4+buttonSize)*1;
-        vote.x=width/2-listWidth/2+(4+buttonSize)*2;
-        close.x=width/2-listWidth/2+(4+buttonSize)*3;
-        directConnect.y = height-bottom+4;
-        addServer.y = height-bottom+4;
-        vote.y = height-bottom+4;
-        close.y = height-bottom+4;
+        directConnect.setX(width/2-listWidth/2);
+        addServer.setX(width/2-listWidth/2+(4+buttonSize)*1);
+        vote.setX(width/2-listWidth/2+(4+buttonSize)*2);
+        close.setX(width/2-listWidth/2+(4+buttonSize)*3);
+        directConnect.setY(height-bottom+4);
+        addServer.setY(height-bottom+4);
+        vote.setY(height-bottom+4);
+        close.setY(height-bottom+4);
         deactivateButtons.run();
 
         addDrawableChild(tagListWidget);
@@ -179,7 +180,7 @@ public class ServerScreen extends Screen {
         tagListWidget.children().clear();
         api.getTags().forEach(tag -> {
             var e = new ScrollListWidget.ScrollListEntry();
-            e.addDrawableChild(new ButtonWidgetBuilder(tag.getDisplayName(),b->{tag.setServersFromTag(handler);e.setMeActive();deactivateButtons.run();}).dimensions(0,0,TAG_LIST_SIZE-4,20).build(),true);
+            e.addDrawableChild(new ButtonWidgetBuilder(tag.getDisplayName(), b->{tag.setServersFromTag(handler);e.setMeActive();deactivateButtons.run();}).dimensions(0,0,TAG_LIST_SIZE-4,20).build(),true);
             tagListWidget.addEntry(e);
         });
     }

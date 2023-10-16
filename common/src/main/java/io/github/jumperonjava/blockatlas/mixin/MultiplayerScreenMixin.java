@@ -96,13 +96,13 @@ public abstract class MultiplayerScreenMixin extends Screen {
         if (entry instanceof MultiplayerServerListWidget.ServerEntry) {
             ServerInfo serverInfo = ((MultiplayerServerListWidget.ServerEntry) entry).getServer();
             var shouldVote = serverInfo != null && ((ServerInfoExt)serverInfo).getVoteLink() != null;
-            voteButton.y = (shouldVote?height-28:1000000);
-            buttonEdit.y = (!shouldVote?height-28:1000000);
+            voteButton.setY(shouldVote?height-28:1000000);
+            buttonEdit.setY(!shouldVote?height-28:1000000);
 
         }
     }
     private int index=0;
-    @ModifyArg(method = "init",index = 0,at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/ButtonWidget;<init>(IIIILnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)V"))
+    @ModifyArg(method = "init",index = 0,at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;dimensions(IIII)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;"))
     int modifyArgXpos(int a){
         return getPos();
     }
@@ -114,7 +114,7 @@ public abstract class MultiplayerScreenMixin extends Screen {
         return pos;
     }
 
-    @ModifyArg(method = "init",index = 2,at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/ButtonWidget;<init>(IIIILnet/minecraft/text/Text;Lnet/minecraft/client/gui/widget/ButtonWidget$PressAction;)V"))
+    @ModifyArg(method = "init",index = 2,at=@At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;dimensions(IIII)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;"))
     int modifyArgWidth(int a){
         return 100;
     }
