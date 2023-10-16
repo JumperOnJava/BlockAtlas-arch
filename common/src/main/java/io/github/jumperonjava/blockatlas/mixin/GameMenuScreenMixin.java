@@ -37,6 +37,6 @@ public abstract class GameMenuScreenMixin extends Screen {
         addDrawableChild(new ButtonWidgetBuilder(Text.translatable("blockatlas.switch"),(b)-> {
             //new MultiplayerScreen(new TitleScreen());
             client.setScreen(new MultiplayerScreen(this));
-            }).position(this.width / 2 + 4, this.height / 4 + 96 + -16).width(98).build());
+            }).position(this.width / 2 + 4, this.height / 4 + 120 + -16).width(98).build());
     }
 }
