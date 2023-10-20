@@ -28,24 +28,24 @@ public abstract class GameMenuScreenMixin extends Screen {
     @Shadow protected abstract ButtonWidget createButton(Text text, Supplier<Screen> screenSupplier);
 
     @Shadow protected abstract void disconnect();
-    @ModifyArg(method = "initWidgets",index = 1,at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/GridWidget$Adder;add(Lnet/minecraft/client/gui/widget/Widget;I)Lnet/minecraft/client/gui/widget/Widget;"))
+    @ModifyArg(method = "initWidgets",index = 1,at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/widget/GridWidget$Adder;add(Lnet/minecraft/client/gui/widget/ClickableWidget;I)Lnet/minecraft/client/gui/widget/ClickableWidget;"))
     int takeonecolumn(int i){
         if(!this.client.isInSingleplayer())
-        return 1;
+            return 1;
         else return i;
     }
     @ModifyArg(method = "initWidgets",at = @At(value = "INVOKE",ordinal = 1,target = "Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;width(I)Lnet/minecraft/client/gui/widget/ButtonWidget$Builder;"))
     int changeexitbuttonsize(int i) {
         if(!this.client.isInSingleplayer())
-        return 98;
+            return 98;
         else return i;
     }
-    @Inject(method = "initWidgets", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE",shift = At.Shift.BEFORE,target = "Lnet/minecraft/client/gui/widget/GridWidget;refreshPositions()V"))
+    @Inject(method = "initWidgets", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE",shift = At.Shift.BEFORE,target = "Lnet/minecraft/client/gui/widget/GridWidget;recalculateDimensions()V"))
     void addServersButton(CallbackInfo ci, GridWidget gridWidget, GridWidget.Adder adder, Text text){
         if(!this.client.isInSingleplayer())
-        adder.add(new ButtonWidget.Builder(Text.translatable("blockatlas.switch"),(b)-> {
-            //new MultiplayerScreen(new TitleScreen());
-            client.setScreen(new MultiplayerScreen(this));
+            adder.add(new ButtonWidget.Builder(Text.translatable("blockatlas.switch"),(b)-> {
+                //new MultiplayerScreen(new TitleScreen());
+                client.setScreen(new MultiplayerScreen(this));
             }).width(98).build());
     }
 }

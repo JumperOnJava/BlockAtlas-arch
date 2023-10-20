@@ -1,12 +1,14 @@
 package io.github.jumperonjava.blockatlas.gui.elements;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -57,8 +59,20 @@ public class ScrollListWidget extends AlwaysSelectedEntryListWidget<ScrollListWi
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
+        beginScissor(left,top,left+width,height);
         super.render(context, mouseX, mouseY, delta);
+        RenderSystem.disableScissor();
+    }
+    public void beginScissor(double x, double y, double endX, double endY)
+    {
+        double width = endX - x;
+        double height = endY - y;
+        width = Math.max(0, width);
+        height = Math.max(0, height);
+        float d = (float) client.getWindow().getScaleFactor();
+        int ay = (int) ((client.getWindow().getScaledHeight() - (y + height)) * d);
+        RenderSystem.enableScissor((int) (x * d), ay, (int) (width * d), (int) (height * d));
     }
     /**
      * Scroll list entry. Out of box does nothing but using addDrawableChild method you can add widgets for custom behaviour.
@@ -85,7 +99,7 @@ public class ScrollListWidget extends AlwaysSelectedEntryListWidget<ScrollListWi
             }
         }
         @Override
-        public void render(DrawContext context,
+        public void render(MatrixStack context,
                            int index,
                            int y, int x,
                            int entryWidth,
@@ -93,14 +107,14 @@ public class ScrollListWidget extends AlwaysSelectedEntryListWidget<ScrollListWi
                            int mouseX, int mouseY,
                            boolean hovered,
                            float delta) {
-            context.getMatrices().push();
-            context.getMatrices().translate(x+6, y, 0);
+            context.push();
+            context.translate(x+6, y, 0);
             entryWidth-=6;
             entryHeight+=2;
             entryWidth-=4;
             if(isSelected){
-                context.fill(-1,-1,entryWidth+1,entryHeight+1,0xFFAAAAAA);
-                context.fill(0,0,entryWidth,entryHeight,0xFF000000);
+                DrawableHelper.fill(context,-1,-1,entryWidth+1,entryHeight+1,0xFFAAAAAA);
+                DrawableHelper.fill(context,0,0,entryWidth,entryHeight,0xFF000000);
             }
             for (var d : drawables) {
                 if(!isHoveredFunction.apply(mouseX,mouseY)){
@@ -111,7 +125,7 @@ public class ScrollListWidget extends AlwaysSelectedEntryListWidget<ScrollListWi
                 currentX = x + 6;
                 currentY = y;
             }
-            context.getMatrices().pop();
+            context.pop();
         }
 
         @Override

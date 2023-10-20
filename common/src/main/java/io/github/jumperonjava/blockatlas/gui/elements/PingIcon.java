@@ -1,13 +1,15 @@
 package io.github.jumperonjava.blockatlas.gui.elements;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.jumperonjava.blockatlas.api.motd.PingWithCache;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -46,71 +48,53 @@ public class PingIcon implements Drawable, Element {
         this.client = MinecraftClient.getInstance();
     }
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         var server = PingWithCache.getServer(this.address).orElse(null);
 
-        Text text = server == null ? Text.literal("").formatted(Formatting.RED) : server.playerCountLabel;
+        Text text = server == null ? Text.literal("").formatted(Formatting.RED) : Text.translatable(server.playerCountLabel.getString()).setStyle(Style.EMPTY.withColor(0xFFAAAAAA));
         //Text text = bl && false ? server.version.copy().formatted(Formatting.RED) : server.playerCountLabel;
         int j = this.client.textRenderer.getWidth((StringVisitable) text);
-        context.drawText(this.client.textRenderer, (Text) text, x - j - 10 - 2, y + 1, 8421504, false);
-        Identifier identifier;
+        DrawableHelper.drawTextWithShadow(context, this.client.textRenderer, (Text) text, x - j - 10 - 2, y + 1, 8421504);
+        int k = 0;
+        int l = 0;
         List list2;
-        int k;
         Object text2;
-        identifier = UNREACHABLE_TEXTURE;
         if (server != null && server.ping != -1L) {
             text2 = Text.translatable("multiplayer.status.ping", new Object[]{server.ping});
             list2 = server.playerListSummary;
             if (server.ping < 150L) {
-                identifier = PING_5_TEXTURE;
+                l = 0;
             } else if (server.ping < 300L) {
-                identifier = PING_4_TEXTURE;
+                l = 1;
             } else if (server.ping < 600L) {
-                identifier = PING_3_TEXTURE;
+                l = 2;
             } else if (server.ping < 1000L) {
-                identifier = PING_2_TEXTURE;
+                l = 3;
             } else {
-                identifier = PING_1_TEXTURE;
+                l = 4;
             }
         } else if (PingWithCache.getting.containsKey(address)) {
             k = 1;
-            int l = (int) (Util.getMeasuringTimeMs() / 100L) % 8;
+            l = (int) (Util.getMeasuringTimeMs() / 100L) % 8;
             if (l > 4) {
                 l = 8 - l;
-            }Identifier var10000;
-            switch (k) {
-                case 1:
-                    var10000 = PINGING_2_TEXTURE;
-                    break;
-                case 2:
-                    var10000 = PINGING_3_TEXTURE;
-                    break;
-                case 3:
-                    var10000 = PINGING_4_TEXTURE;
-                    break;
-                case 4:
-                    var10000 = PINGING_5_TEXTURE;
-                    break;
-                default:
-                    var10000 = PINGING_1_TEXTURE;
             }
-
-
 
             text2 = PINGING_TEXT;
             list2 = Collections.emptyList();
-        }//PingWithCache.failed.contains(address)
-        else{
-                identifier = UNREACHABLE_TEXTURE;
+        } else if (PingWithCache.failed.contains(address)){
+            {
+                l = 5;
+                text2 = NO_CONNECTION_TEXT;
                 list2 = Collections.emptyList();
+            }
         }
-
-        context.drawGuiTexture(identifier, x - 10, y, 10, 8);
+        RenderSystem.setShaderTexture(0,ICONS_TEXTURE);
+        DrawableHelper.drawTexture(context,x - 10, y, (float) (k * 10), (float) (176 + l * 8), 10, 8, 256, 256);
         //context.fill(x,y,x-10,y+8,0xFFFFFF00);
         if(isMouseOver(mouseX,mouseY)){
             var pingtext = Text.literal(String.valueOf(server == null ? "Failed to get ping" : server.ping+" ms"));
-            context.drawTooltip(client.textRenderer,pingtext,mouseX-20-client.textRenderer.getWidth(pingtext.getString()),mouseY+12);
+            //DrawableHelper.too(client.textRenderer,pingtext,mouseX-20-client.textRenderer.getWidth(pingtext.getString()),mouseY+12);
         }
 
     }
@@ -121,11 +105,9 @@ public class PingIcon implements Drawable, Element {
     }
 
 
-    @Override
     public void setFocused(boolean focused) {
     }
 
-    @Override
     public boolean isFocused() {
         return false;
     }

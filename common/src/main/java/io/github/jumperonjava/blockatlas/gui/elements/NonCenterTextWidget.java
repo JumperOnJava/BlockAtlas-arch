@@ -2,11 +2,10 @@ package io.github.jumperonjava.blockatlas.gui.elements;
 
 import io.github.jumperonjava.blockatlas.api.Server;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class NonCenterTextWidget implements Drawable {
@@ -21,7 +20,7 @@ public class NonCenterTextWidget implements Drawable {
         this.tr=textRenderer;
     }
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.drawText(tr,t,x,y,0xFFFFFFFF,true);
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
+        DrawableHelper.drawTextWithShadow(context,tr,t,x,y,0xFFFFFFFF);
     }
 }

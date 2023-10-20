@@ -1,12 +1,13 @@
 package io.github.jumperonjava.blockatlas.api.blockatlas;
 
 import io.github.jumperonjava.blockatlas.api.*;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
 public class BlockAtlasTag implements io.github.jumperonjava.blockatlas.api.Tag {
     public static final Tag MAIN_PAGE_TAG = new CachingTag(new BlockAtlasTag(""){
         @Override
-        public Text getDisplayName() {
+        public MutableText getDisplayName() {
             return Text.literal("All Servers");
         }
 
@@ -54,7 +55,7 @@ public class BlockAtlasTag implements io.github.jumperonjava.blockatlas.api.Tag 
         }
     }
     @Override
-    public Text getDisplayName() {
+    public MutableText getDisplayName() {
         return Text.literal(tagname);
     }
     protected String getApiLink(int page){

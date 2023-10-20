@@ -6,18 +6,20 @@ import io.github.jumperonjava.blockatlas.api.ListHandler;
 import io.github.jumperonjava.blockatlas.api.Server;
 import io.github.jumperonjava.blockatlas.api.ServerApi;
 import io.github.jumperonjava.blockatlas.api.Tag;
+import io.github.jumperonjava.blockatlas.gui.backport.ButtonWidgetBuilder;
 import io.github.jumperonjava.blockatlas.util.ServerInfoExt;
 import io.github.jumperonjava.blockatlas.gui.elements.*;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.widget.AxisGridWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -52,8 +54,8 @@ public class ServerScreen extends Screen {
     private boolean smallmode=false;
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context,mouseX,mouseY,delta);
+    public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
+        renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
     }
 
@@ -95,18 +97,18 @@ public class ServerScreen extends Screen {
         serverListWidget = new ScrollListWidget(client,SERVER_LIST_SIZE,height-bottom,centerpos+TAG_LIST_SIZE+LIST_GAP,top,smallmode?38:54);
         updateServerList();
         //title
-        addDrawable(((context, mouseX, mouseY, delta) -> context.drawCenteredTextWithShadow(textRenderer,Text.translatable("blockatlas.title"),width/2,8,0xFFFFFFFF)));
+        addDrawable(((context, mouseX, mouseY, delta) -> DrawableHelper.drawCenteredTextWithShadow(context,textRenderer,Text.translatable("blockatlas.title").asOrderedText(),width/2,8,0xFFFFFFFF)));
 
         //lower buttons grid
         var listWidth = SERVER_LIST_SIZE+TAG_LIST_SIZE;
-        var axis = new AxisGridWidget(width/2-(listWidth)/2,height-bottom+4, listWidth,20, AxisGridWidget.DisplayAxis.HORIZONTAL);
+        //var axis = new AxisGridWidget(width/2-(listWidth)/2,height-bottom+4, listWidth,20, AxisGridWidget.DisplayAxis.HORIZONTAL);
         //buttons themselves
         var buttonSize = (listWidth-44)/3-4;
-        var directConnect = new ButtonWidget.Builder(Text.translatable("selectServer.select"),(b)->{
+        var directConnect = new ButtonWidgetBuilder(Text.translatable("selectServer.select"),(b)->{
             connect(selectedServer);
         }).dimensions(0,0,buttonSize,20).build();
-        var addServer = new ButtonWidget.Builder(Text.translatable("selectServer.add"),(b)->{addServer(selectedServer);}).dimensions(0,0,buttonSize,20).build();
-        var vote = new ButtonWidget.Builder(Text.translatable("blockatlas.vote"),(b)->{
+        var addServer = new ButtonWidgetBuilder(Text.translatable("selectServer.add"),(b)->{addServer(selectedServer);}).dimensions(0,0,buttonSize,20).build();
+        var vote = new ButtonWidgetBuilder(Text.translatable("blockatlas.vote"),(b)->{
             try{
                 Util.getOperatingSystem().open(new URL(selectedServer.getVoteLink()));
             }
@@ -120,7 +122,7 @@ public class ServerScreen extends Screen {
             },50);
             setFocused(null);
         }).dimensions(0,0,buttonSize,20).build();
-        var addServerToList = new ButtonWidget.Builder(Text.translatable("blockatlas.addToList"),(b)->{
+        var addServerToList = new ButtonWidgetBuilder(Text.translatable("blockatlas.addToList"),(b)->{
             try{
                 Util.getOperatingSystem().open(new URL("https://blockatlas.net/add-server"));
             }
@@ -134,7 +136,7 @@ public class ServerScreen extends Screen {
             },50);
             setFocused(null);
         }).dimensions(width/2+listWidth/2-100,2,buttonSize,20).build();
-        var close = new ButtonWidget.Builder(Text.translatable("gui.back"),b->this.close()).width(40).build();
+        var close = new ButtonWidgetBuilder(Text.translatable("gui.back"),b->this.close()).width(40).build();
         this.deactivateButtons = () ->{
             directConnect.active=false;
             addServer.active=false;
@@ -145,23 +147,32 @@ public class ServerScreen extends Screen {
             addServer.active=true;
             vote.active=true;
         };
-        deactivateButtons.run();
-        addDrawableChild(axis.add(directConnect));
-        addDrawableChild(axis.add(addServer));
-        addDrawableChild(axis.add(vote));
-        addDrawableChild(axis.add(close));
-        axis.refreshPositions();
 
-        updateServerList();
+        directConnect.setX(width/2-listWidth/2);
+        addServer.setX(width/2-listWidth/2+(4+buttonSize)*1);
+        vote.setX(width/2-listWidth/2+(4+buttonSize)*2);
+        close.setX(width/2-listWidth/2+(4+buttonSize)*3);
+        directConnect.setY(height-bottom+4);
+        addServer.setY(height-bottom+4);
+        vote.setY(height-bottom+4);
+        close.setY(height-bottom+4);
+        deactivateButtons.run();
+
         addDrawableChild(tagListWidget);
         addDrawableChild(serverListWidget);
+        updateServerList();
+        addDrawableChild((directConnect));
+        addDrawableChild((addServer));
+        addDrawableChild((vote));
+        addDrawableChild((close));
+        //axis.refreshPositions();
         addDrawableChild((addServerToList));
     }
 
     private void connect(Server selectedServer) {
         BlockAtlasInit.disconnect();
         var t = (selectedServer.server_ip()+":25565").split(":");
-        ConnectScreen.connect(this,client,new ServerAddress(t[0], Integer.parseInt(t[1])),new ServerInfo("",selectedServer.server_ip(), ServerInfo.ServerType.OTHER),true);
+        ConnectScreen.connect(this,client,new ServerAddress(t[0], Integer.parseInt(t[1])),new ServerInfo("",selectedServer.server_ip(), false));
         selectedServer.onConnected();
     }
 
@@ -169,7 +180,7 @@ public class ServerScreen extends Screen {
         tagListWidget.children().clear();
         api.getTags().forEach(tag -> {
             var e = new ScrollListWidget.ScrollListEntry();
-            e.addDrawableChild(new ButtonWidget.Builder(tag.getDisplayName(),b->{tag.setServersFromTag(handler);e.setMeActive();deactivateButtons.run();}).dimensions(0,0,TAG_LIST_SIZE-4,20).build(),true);
+            e.addDrawableChild(new ButtonWidgetBuilder(tag.getDisplayName(), b->{tag.setServersFromTag(handler);e.setMeActive();deactivateButtons.run();}).dimensions(0,0,TAG_LIST_SIZE-4,20).build(),true);
             tagListWidget.addEntry(e);
         });
     }
@@ -186,7 +197,10 @@ public class ServerScreen extends Screen {
                 var e = new ScrollListWidget.ScrollListEntry() {
                 };
                 if (server.featured()) {
-                    e.addDrawable((a, b, c, d) -> a.drawTexture(new Identifier("blockatlas", "textures/gui/featuredtext.png"), 54 + textRenderer.getWidth(server.server_name()), 5, 0, 0, 51, 7, 51, 7));
+                    e.addDrawable((a, b, c, d) -> {
+                        RenderSystem.setShaderTexture(0,new Identifier("blockatlas", "textures/gui/featuredtext.png"));
+                        DrawableHelper.drawTexture(a,54 + textRenderer.getWidth(server.server_name()), 5, 0, 0, 51, 7, 51, 7);
+                    });
                 }
                 e.addDrawable(new NonCenterTextWidget(iconsize + 4, 4, Text.literal(server.server_name()), textRenderer));
                 e.addDrawable(new TextureWidget(new LazyUrlTexture(server.favicon_url()), 2, 2, iconsize, iconsize));
@@ -195,7 +209,7 @@ public class ServerScreen extends Screen {
                     int lineindex = 1;
                     List<OrderedText> list = textRenderer.wrapLines(server.motd().get(), 271);
                     for (var line : list) {
-                        context.drawText(textRenderer, line, iconsize + 4, lineindex * 10 + (smallmode ? 6 : 10), 0xFFFFFFFF, false);
+                        textRenderer.draw(context, line, iconsize + 4, lineindex * 10 + (smallmode ? 6 : 10), 0xFFFFFFFF);
                         lineindex++;
                         if (lineindex > 3)
                             break;
@@ -223,7 +237,7 @@ public class ServerScreen extends Screen {
             };
             if(serverListWidget.children().size()==0)
                 return;
-            var loadmore = e.addDrawableChild(new ButtonWidget.Builder(Text.translatable("blockatlas.loadmore"),(b)-> loadMore.run())
+            var loadmore = e.addDrawableChild(new ButtonWidgetBuilder(Text.translatable("blockatlas.loadmore"),(b)-> loadMore.run())
                     .dimensions(SERVER_LIST_SIZE/2-50,14,100,20).build(),false);
             serverListWidget.addEntry(e);
             if(isLastNull)
@@ -233,7 +247,7 @@ public class ServerScreen extends Screen {
     }
 
     private void addServer(Server server) {
-        var serverInfo = new ServerInfo(server.server_name(),server.server_ip(), ServerInfo.ServerType.OTHER);
+        var serverInfo = new ServerInfo(server.server_name(),server.server_ip(), false);
         ((ServerInfoExt)serverInfo).setVoteLink(server.getVoteLink());
         ((ServerInfoExt)serverInfo).setPostReq(server.getPostReq());
 
@@ -274,8 +288,8 @@ public class ServerScreen extends Screen {
             var e = new ScrollListWidget.ScrollListEntry();
             var lw = target.serverListWidget;
             e.addDrawable((context, mouseX, mouseY, delta) -> {
-                context.drawCenteredTextWithShadow(target.client.textRenderer,Text.translatable("blockatlas.servererror"),lw.getRowWidth()/2,4,0xFFFF8888);
-                context.drawCenteredTextWithShadow(target.client.textRenderer,Text.literal(error.getMessage()),lw.getRowWidth()/2,14,0xFFFF8888);
+                DrawableHelper.drawCenteredTextWithShadow(context,target.client.textRenderer,Text.translatable("blockatlas.servererror").asOrderedText(),lw.getRowWidth()/2,4,0xFFFF8888);
+                DrawableHelper.drawCenteredTextWithShadow(context,target.client.textRenderer,Text.literal(error.getMessage()).asOrderedText(),lw.getRowWidth()/2,14,0xFFFF8888);
             });
             lw.addEntry(e);
         }
