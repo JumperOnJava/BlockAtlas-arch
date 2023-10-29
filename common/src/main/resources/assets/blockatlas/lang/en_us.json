@@ -7,5 +7,6 @@
   "blockatlas.title": "Discover Servers by BlockAtlas ",
   "blockatlas.vote": "Vote",
   "blockatlas.switch": "Switch server",
-  "blockatlas.addToList": "Add My Server"
+  "blockatlas.addToList": "Add My Server",
+  "blockatlas.refresh": "Refresh"
 }
