@@ -8,5 +8,6 @@
   "blockatlas.vote": "Vote",
   "blockatlas.switch": "Switch servers",
   "blockatlas.addToList": "Add My Server",
-  "blockatlas.refresh": "Refresh"
+  "blockatlas.refresh": "Refresh",
+  "multiplayer.status.player_count": ""
 }
